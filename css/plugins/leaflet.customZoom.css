@@ -1,15 +1,11 @@
 .leaflet-container .leaflet-control-zoom {
   background: #fff;
-background-clip: padding-box;
-
-  margin-left: 10px;
-  margin-top: 10px;
+  background-clip: padding-box;
   border-radius: 5px;
   color: #333;
   font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
-  float:left;
-  width: initial !important;
-
+  border: 1px solid #ccc;
+  width: auto;
 }
 
 

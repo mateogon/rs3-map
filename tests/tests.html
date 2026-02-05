@@ -54,6 +54,19 @@
                 const latLng = pos1.toLatLng(map);
                 assert(latLng.lat === 200 && latLng.lng === 100, "Position.toLatLng maps correctly (1:1)");
 
+                // TEST 1.1: Position Rounding
+                // X.1 should be X
+                const posLow = Position.fromLatLng(map, { lng: 3200.1, lat: 3400.1 }, 0);
+                assert(posLow.x === 3200 && posLow.y === 3400, "Position rounds down 3200.1 -> 3200");
+
+                // X.9 should be X (with Math.floor)
+                const posHigh = Position.fromLatLng(map, { lng: 3200.9, lat: 3400.9 }, 0);
+                assert(posHigh.x === 3200 && posHigh.y === 3400, "Position rounds down 3200.9 -> 3200");
+
+                // X.5 should be X
+                const posMid = Position.fromLatLng(map, { lng: 3200.5, lat: 3400.5 }, 0);
+                assert(posMid.x === 3200 && posMid.y === 3400, "Position rounds down 3200.5 -> 3200");
+
                 // TEST 2: Area
                 const area = new Area(new Position(10, 10, 0), new Position(20, 20, 0));
                 assert(area.startPosition.x === 10, "Area start position correct");

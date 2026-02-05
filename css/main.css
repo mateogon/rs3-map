@@ -145,17 +145,22 @@ img.huechange { filter: hue-rotate(120deg); }
 /* Collection Control Styles */
 .leaflet-control-custom {
     background-color: #fff;
-    border: 1px solid #ccc;
     cursor: pointer;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-    width: 30px;
-    height: 30px;
+    width: 100% !important;
+    height: 30px !important;
     display: block;
     text-align: center;
-    line-height: 30px;
+    line-height: 30px !important;
     color: #333;
     font-size: 16px;
     text-decoration: none;
+    box-sizing: border-box; 
+    border-bottom: 1px solid #ccc;
+    margin: 0 !important;
+}
+
+.leaflet-control-custom:last-child {
+    border-bottom: none;
 }
 
 .leaflet-control-custom:hover {

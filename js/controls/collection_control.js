@@ -107,16 +107,11 @@ export var CollectionControl = L.Control.extend({
     },
     
     _createControl: function(html, container, onClick) {
-        var control = L.DomUtil.create('a', 'leaflet-bar leaflet-control leaflet-control-custom', container);
+        var control = L.DomUtil.create('a', 'leaflet-control-custom', container);
         control.innerHTML = html;
         control.href = '#';
-        control.style.display = 'block';
-        control.style.textAlign = 'center';
-        control.style.cursor = 'pointer';
-        control.style.textDecoration = 'none';
-        control.style.color = 'black';
-        control.style.fontSize = '18px';
-        control.style.lineHeight = '30px';
+
+        // Styles are now handled by CSS (.leaflet-control-custom)
         
         L.DomEvent.on(control, 'click', L.DomEvent.stop)
                   .on(control, 'click', onClick, this);

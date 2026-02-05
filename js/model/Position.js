@@ -6,8 +6,8 @@ export const RS_TILE_HEIGHT_PX = 0;
 export class Position {
 
     constructor(x, y, z) {
-        this.x = Math.round(x);
-        this.y = Math.round(y);
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
         this.z = z;
     }
 

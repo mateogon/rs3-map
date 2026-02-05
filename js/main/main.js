@@ -30,6 +30,7 @@ void (function (global) {
         fullscreenControl: true,
         planeControl: true,
         positionControl: true,
+        mapSelectorControl: true,
         searchControl: true,
         messageBox: true,
         rect: true,
