@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mejrs Map Tests</title>
+    <!-- Mock Leaflet for headless testing if needed, or just include real one -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css" />
+
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .pass { color: green; }
+        .fail { color: red; font-weight: bold; }
+        .test-case { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Unit Tests</h1>
+    <div id="results">Running...</div>
+    <div id="map" style="height: 100px; width: 100px; display:none;"></div>
+
+    <script type="module">
+        import { Position } from '../js/model/Position.js';
+        import { Area } from '../js/model/Area.js';
+        import { PolyArea } from '../js/model/PolyArea.js';
+
+        const map = L.map('map', {
+            zoomControl: false,
+            crs: L.CRS.Simple
+        });
+        // Mock map functions if needed
+        map.project = (latlng, zoom) => L.point(latlng.lng, latlng.lat);
+        map.unproject = (point, zoom) => L.latLng(point.y, point.x);
+        map.getMaxZoom = () => 4;
+
+        const results = document.getElementById('results');
+        results.innerHTML = "";
+        let passed = 0;
+        let failed = 0;
+
+        function assert(condition, message) {
+            const div = document.createElement('div');
+            div.className = 'test-case ' + (condition ? 'pass' : 'fail');
+            div.textContent = (condition ? '[PASS] ' : '[FAIL] ') + message;
+            results.appendChild(div);
+            if (condition) passed++; else failed++;
+        }
+
+        async function runTests() {
+            try {
+                // TEST 1: Position
+                const pos1 = new Position(100, 200, 0);
+                assert(pos1.x === 100 && pos1.y === 200, "Position constructor stores values");
+                
+                const latLng = pos1.toLatLng(map);
+                assert(latLng.lat === 200 && latLng.lng === 100, "Position.toLatLng maps correctly (1:1)");
+
+                // TEST 2: Area
+                const area = new Area(new Position(10, 10, 0), new Position(20, 20, 0));
+                assert(area.startPosition.x === 10, "Area start position correct");
+                const leafRect = area.toLeaflet(map);
+                assert(leafRect instanceof L.Rectangle, "Area.toLeaflet returns L.Rectangle");
+
+                // TEST 3: PolyArea (The one that crashed)
+                const poly = new PolyArea(map);
+                assert(poly.isEmpty(), "PolyArea starts empty");
+                
+                // Crash reproduction attempt
+                try {
+                    poly.add(new Position(30, 30, 0));
+                    assert(poly.positions.length === 1, "PolyArea added first point without crash");
+                } catch (e) {
+                    assert(false, "PolyArea.add CRASHED on first point: " + e.message);
+                }
+
+                try {
+                    poly.add(new Position(40, 40, 0));
+                    assert(poly.positions.length === 2, "PolyArea added second point without crash");
+                } catch (e) {
+                    assert(false, "PolyArea.add CRASHED on second point: " + e.message);
+                }
+                
+                // Verify content
+                assert(poly.positions[0].x === 30, "PolyArea point 1 is correct");
+
+                // Summary
+                const summary = document.createElement('h2');
+                summary.textContent = `Total: ${passed + failed}, Passed: ${passed}, Failed: ${failed}`;
+                summary.style.color = failed > 0 ? 'red' : 'green';
+                results.prepend(summary);
+
+            } catch (e) {
+                assert(false, "Test Suite Crashed: " + e.message);
+                console.error(e);
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+</html>

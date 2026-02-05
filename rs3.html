@@ -16,6 +16,8 @@
 	<link rel="stylesheet" href="css/plugins/leaflet.mapTemplate.css"/>
 	<link rel="stylesheet" href="css/plugins/leaflet.customZoom.css"/>
 
+    <!-- jQuery for CollectionControl -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <script type="module" src="js/leaflet.js"></script>
 	<script type="module" src="js/plugins/leaflet.fullscreen.js"></script>
@@ -32,5 +34,8 @@
 	</head>
   <body>
      <div id="map"></div>
+     <div class="slide-panel" id="code-output-panel">
+        <pre id="code-output-pre"><code id="code-output" contenteditable="true"></code></pre>
+     </div>
   </body>
 </html>

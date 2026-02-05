@@ -38,3 +38,6 @@ var icons = L.tileLayer.main('https://raw.githubusercontent.com/mejrs/layers_rs3
         maxZoom: 4,
 		iconMode: "",
    }).addTo(runescape_map);
+
+import { CollectionControl } from '../controls/collection_control.js';
+runescape_map.addControl(new CollectionControl({ position: 'topright' }));
