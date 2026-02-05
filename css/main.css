@@ -64,6 +64,10 @@ img.huechange { filter: hue-rotate(120deg); }
 }
  
  
+.leaflet-control-layers-selector {
+    top: auto;
+}
+
 .leaflet-control-message-box {
 	position: relative;
 	left: 50%;
@@ -210,4 +214,10 @@ img.huechange { filter: hue-rotate(120deg); }
 #code-output {
     font-family: monospace;
     font-size: 12px;
+}
+
+.map-label-sub-container {
+    transform: scale(var(--label-scale, 1));
+    transform-origin: center;
+    will-change: transform;
 }

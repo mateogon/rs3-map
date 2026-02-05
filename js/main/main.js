@@ -47,6 +47,7 @@ void (function (global) {
         loadMapData: true,
         showMapBorder: true,
         enableUrlLocation: true,
+        preferCanvas: true
     }));
 
     L.control.display

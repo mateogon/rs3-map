@@ -32,14 +32,27 @@ export default void (function (factory) {
                 });
             L.LayerGroup.prototype.eachLayer.call(this, map.addLayer, map);
 
-            map.on("zoomanim", (e) => {
-                let scale = map.getZoomScale(e.zoom, 2);
+            const updateScale = (zoom) => {
+                // Clamp scale to prevent labels from becoming illegibly small or absurdly large?
+                // User said "too large... clamp it".
+                // Let's just set the logical scale for now. 
+                // If they want it restricted, maybe min/max?
+                // But preventing "Too Large" means ensuring it SCALES DOWN.
+                 let scale = map.getZoomScale(zoom, 2);
+                // Clamp scale to max 1 (100% size) to prevent oversized labels when zooming in
+                if (scale > 1) scale = 1;
+                
+                map.getContainer().style.setProperty('--label-scale', scale);
+            };
 
-                let labels = document.getElementsByClassName("map-label-container");
-                for (const label of labels) {
-                    label.firstChild.setAttribute("style", `transform: scale(${scale})`);
-                    label.setAttribute("style", "transform: translate(-50%, -50%)");
-                }
+            updateScale(map.getZoom());
+
+            map.on("zoomanim", (e) => {
+                updateScale(e.zoom);
+            });
+            
+            map.on("zoomend", () => {
+                 updateScale(map.getZoom());
             });
         },
 
@@ -56,8 +69,6 @@ export default void (function (factory) {
             let sub = document.createElement("div");
             sub.appendChild(text);
             sub.setAttribute("class", "map-label-sub-container");
-            let scale = this._map.getZoomScale(this._map.getZoom(), 2);
-            sub.setAttribute("style", `transform: scale(${scale})`);
 
             let html = document.createElement("div");
             html.setAttribute("class", "map-label-container");

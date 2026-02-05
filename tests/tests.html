@@ -22,15 +22,17 @@
         import { Position } from '../js/model/Position.js';
         import { Area } from '../js/model/Area.js';
         import { PolyArea } from '../js/model/PolyArea.js';
+        // Import maplabels (side effect: registers L.maplabelGroup)
+        import '../js/plugins/leaflet.maplabels.js?v=debug1'; 
 
         const map = L.map('map', {
             zoomControl: false,
             crs: L.CRS.Simple
         });
-        // Mock map functions if needed
         map.project = (latlng, zoom) => L.point(latlng.lng, latlng.lat);
         map.unproject = (point, zoom) => L.latLng(point.y, point.x);
         map.getMaxZoom = () => 4;
+        map.setView([0, 0], 0);
 
         const results = document.getElementById('results');
         results.innerHTML = "";
@@ -94,6 +96,53 @@
                 
                 // Verify content
                 assert(poly.positions[0].x === 30, "PolyArea point 1 is correct");
+
+                // TEST 4: Map Labels Optimization
+                // Mock fetch for the labels
+                const mockLabels = { values: [] };
+                for(let i=0; i<1000; i++) {
+                    mockLabels.values.push([3200 + (i%100), 3200 + (i/100), 0, `Label ${i}`]);
+                }
+                const originalFetch = window.fetch;
+                window.fetch = async () => ({ json: async () => mockLabels });
+
+                try {
+                    const labelsLayer = L.maplabelGroup({ API_KEY: 'test', SHEET_ID: 'test' });
+                    labelsLayer.addTo(map);
+
+                    // Wait for fetch/add to complete (microtask)
+                    await new Promise(r => setTimeout(r, 10));
+
+                    // Trigger zoom animation
+                    const start = performance.now();
+                    // Ensure center is set for getZoomScale internally if needed? 
+                    // But we mocked functions so maybe it's fine.
+                    // Let's verify what getZoomScale returns
+                    const calculatedScale = map.getZoomScale(3, 2);
+                    console.log("Calculated Scale in Test from map.getZoomScale(3, 2):", calculatedScale);
+
+                    map.fire('zoomanim', { zoom: 3, center: map.getCenter() });
+                    const end = performance.now();
+                    
+                    const duration = end - start;
+                    const scaleVar = map.getContainer().style.getPropertyValue('--label-scale');
+                    console.log("Read --label-scale from container:", scaleVar);
+                    console.log("Container style cssText:", map.getContainer().style.cssText);
+
+                    assert(scaleVar !== '', "CSS variable --label-scale was set. Got: '" + scaleVar + "'");
+                    // 1000 labels should be instant with CSS variable (e.g. < 5ms), whereas DOM loop would be slower.
+                    // We'll be generous with 10ms to account for overhead, but it confirms O(1) mostly.
+                    assert(duration < 20, `Zoom anim handler took ${duration.toFixed(2)}ms (expected < 20ms)`);
+                    
+                    // Verify logic
+                    const expectedScale = map.getZoomScale(3, 2); // 2 is from maplabels source
+                    assert(Math.abs(parseFloat(scaleVar) - expectedScale) < 0.001, "Scale value is correct");
+
+                } catch(e) {
+                    assert(false, "MapLabel optimization test failed: " + e.message);
+                } finally {
+                    window.fetch = originalFetch;
+                }
 
                 // Summary
                 const summary = document.createElement('h2');
