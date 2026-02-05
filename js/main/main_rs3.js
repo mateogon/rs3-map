@@ -9,6 +9,7 @@ var runescape_map = L.gameMap('map', {
         fullscreenControl: true,
 		planeControl: true,
 		mapSelectorControl: true,
+		searchControl: true,
 
 		
         x: 3232,

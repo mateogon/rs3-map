@@ -12,6 +12,8 @@ import "../../js/plugins/leaflet.urllayers.js";
 import "../../js/plugins/leaflet.rect.js";
 import "../../js/plugins/leaflet.clickcopy.js";
 import "../../js/plugins/leaflet.maplabels.js";
+import "../../js/plugins/leaflet.search.js";
+import { CollectionControl } from '../controls/collection_control.js';
 
 import plot_map_labels from "../../js/plugins/leaflet.labels.js";
 window.plot_map_labels = plot_map_labels;
@@ -28,6 +30,7 @@ void (function (global) {
         fullscreenControl: true,
         planeControl: true,
         positionControl: true,
+        searchControl: true,
         messageBox: true,
         rect: true,
         initialMapId: -1,
@@ -131,4 +134,6 @@ void (function (global) {
             }
         )
         .addTo(runescape_map);
+
+    runescape_map.addControl(new CollectionControl({ position: 'topright' }));
 })(this || window);

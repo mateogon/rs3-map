@@ -1,0 +1,52 @@
+.leaflet-control-search {
+    background: white;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    pointer-events: auto;
+    width: 210px;
+}
+
+.leaflet-search-input {
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.leaflet-search-results {
+    background: white;
+    max-height: 250px;
+    overflow-y: auto;
+    width: 200px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    display: none;
+}
+
+.leaflet-search-result {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    color: #333;
+}
+
+.leaflet-search-result:last-child {
+    border-bottom: none;
+}
+
+.leaflet-search-result:hover {
+    background: #f0f0f0;
+}
+
+.leaflet-search-result .category {
+    font-size: 10px;
+    color: #888;
+    display: block;
+    margin-top: 2px;
+}
