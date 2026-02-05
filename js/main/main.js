@@ -47,7 +47,9 @@ void (function (global) {
         loadMapData: true,
         showMapBorder: true,
         enableUrlLocation: true,
-        preferCanvas: true
+        preferCanvas: true,
+        fadeAnimation: false,
+        markerZoomAnimation: false
     }));
 
     L.control.display
@@ -66,18 +68,24 @@ void (function (global) {
     L.control.display.pathfinder().addTo(runescape_map);
 
     L.tileLayer
-        .main("https://raw.githubusercontent.com/mejrs/layers_rs3/refs/heads/master/map_squares/{mapId}/{zoom}/{plane}_{x}_{y}.png", {
+        .main("https://cdn.jsdelivr.net/gh/mejrs/layers_rs3@master/map_squares/{mapId}/{zoom}/{plane}_{x}_{y}.png", {
             minZoom: -4,
             maxNativeZoom: 3,
             maxZoom: 5,
+            keepBuffer: 8,
+            updateWhenIdle: false,
+            source: 'Map',
+            errorTileUrl: '' // Suppress flickering warning
         })
         .addTo(runescape_map)
         .bringToBack();
 
-    var icon_squares = L.tileLayer.main("https://raw.githubusercontent.com/mejrs/layers_rs3/refs/heads/master/icon_squares/{mapId}/{zoom}/{plane}_{x}_{y}.png", {
+    var icon_squares = L.tileLayer.main("https://cdn.jsdelivr.net/gh/mejrs/layers_rs3@master/icon_squares/{mapId}/{zoom}/{plane}_{x}_{y}.png", {
         minZoom: -4,
         maxNativeZoom: 3,
         maxZoom: 5,
+        source: 'Icons',
+        errorTileUrl: ''
     });
 
     var grid = L.grid({
@@ -106,16 +114,20 @@ void (function (global) {
         SHEET_ID: "1apnt91ud4GkWsfuxJTXdhrGjyGFL0hNz6jYDED3abX0",
     });
 
-    let nomove = L.tileLayer.main('https://raw.githubusercontent.com/mejrs/layers_rs3/refs/heads/master/nomove/-1/{zoom}/{plane}_{x}_{y}.png', {
+    let nomove = L.tileLayer.main('https://cdn.jsdelivr.net/gh/mejrs/layers_rs3@master/nomove/-1/{zoom}/{plane}_{x}_{y}.png', {
         minZoom: -4,
         maxNativeZoom: 2,
         maxZoom: 8,
+        source: 'NoMove',
+        errorTileUrl: ''
     });
 
-    let objects = L.tileLayer.main('https://raw.githubusercontent.com/mejrs/layers_rs3/refs/heads/master/locations/-1/{zoom}/{plane}_{x}_{y}.png', {
+    let objects = L.tileLayer.main('https://cdn.jsdelivr.net/gh/mejrs/layers_rs3@master/locations/-1/{zoom}/{plane}_{x}_{y}.png', {
         minZoom: -4,
         maxNativeZoom: 2,
         maxZoom: 8,
+        source: 'Objects',
+        errorTileUrl: ''
     });
 
     L.control.layers
@@ -138,4 +150,8 @@ void (function (global) {
         .addTo(runescape_map);
 
     runescape_map.addControl(new CollectionControl({ position: 'topright' }));
+    
+    // Background cache warmer for instant zoom-out
+    import("../../js/plugins/warm_cache.js").then(module => module.warmCache());
+
 })(this || window);

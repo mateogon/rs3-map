@@ -144,6 +144,54 @@
                     window.fetch = originalFetch;
                 }
 
+                // TEST 5: CDN Speed Benchmark
+                console.log("Starting CDN Benchmark...");
+                // Use a likely existing tile path. 
+                // Trying a tile from the surface map icons.
+                const testPath = "icon_squares/-1/1/0_32_32.png"; // Near 3200,3200
+                
+                const oldUrl = `https://raw.githubusercontent.com/mejrs/layers_rs3/refs/heads/master/${testPath}`;
+                const newUrl = `https://cdn.jsdelivr.net/gh/mejrs/layers_rs3@master/${testPath}`;
+
+                const benchmark = async (url, label) => {
+                    const t0 = performance.now();
+                    try {
+                        const res = await fetch(url, { method: 'HEAD' }); 
+                        if(!res.ok) console.warn(label + " fetch status: " + res.status);
+                    } catch(e) {
+                        console.warn(label + " error: " + e.message);
+                    }
+                    return performance.now() - t0;
+                };
+
+                // Sequential benchmark
+                const tOld = await benchmark(oldUrl, "Old Source");
+                const tNew = await benchmark(newUrl, "New Source (CDN)");
+                
+                // SW Cache Benchmark: Fetch the CDN URL again. 
+                // If SW is compliant, this should be effectively instant (< 20ms) or at least memory-cache speed.
+                const tCache = await benchmark(newUrl, "SW Cache Hit");
+
+                console.log(`Speed Test Result: Raw=${tOld.toFixed(2)}ms, CDN=${tNew.toFixed(2)}ms, Cache=${tCache.toFixed(2)}ms`);
+                
+                // Assert reasonable CDN response
+                assert(tNew < 2000, `CDN response time is reasonable (${tNew.toFixed(0)}ms)`);
+                
+                // Assert Cache speed
+                // Ideally < 50ms. Allowing 100ms for browser busy-ness.
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    assert(tCache < 100, `Service Worker Cache is fast (${tCache.toFixed(2)}ms)`);
+                    assert(tCache < tNew, `Cache (${tCache.toFixed(0)}ms) is faster than Network (${tNew.toFixed(0)}ms)`);
+                } else {
+                    console.warn("Service Worker not controlling validation page. Skipping Cache assertions.");
+                }
+
+                if (tNew > tOld && tOld < 50) {
+                     // If both are super fast (local/cached), ignore comparison.
+                } else if (tNew > tOld * 2) {
+                     console.warn("Warning: CDN was slower in this run.");
+                }
+
                 // Summary
                 const summary = document.createElement('h2');
                 summary.textContent = `Total: ${passed + failed}, Passed: ${passed}, Failed: ${failed}`;
