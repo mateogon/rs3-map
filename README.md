@@ -4,7 +4,7 @@ This was developed as part of the [RuneScape Wiki](https://runescape.wiki/ "The 
 
 ## Contributing
 
-You cna contribute by searching for old game caches
+You can contribute by searching for old game caches
 
 ## Cloning
 
